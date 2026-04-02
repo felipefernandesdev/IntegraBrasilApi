@@ -5,10 +5,20 @@ using IntegraBrasilApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+// =======================
+// CONFIG PORTA (ANTES DO BUILD)
+// =======================
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(int.Parse(port));
+});
+
+// =======================
+// SERVICES
+// =======================
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -19,25 +29,24 @@ builder.Services.AddSingleton<IBrasilApi, BrasilApiRest>();
 builder.Services.AddAutoMapper(typeof(EnderecoMapping));
 builder.Services.AddAutoMapper(typeof(BancoMapping));
 
+// =======================
+// BUILD
+// =======================
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// =======================
+// PIPELINE
+// =======================
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(int.Parse(port));
-});
-
 app.UseAuthorization();
 app.MapControllers();
 
-
-
+// =======================
+// RUN
+// =======================
 app.Run();
