@@ -1,0 +1,28 @@
+# Força uso de versão estável do .NET (evita preview quebrado)
+[variables]
+NIXPACKS_DOTNET_VERSION = "8.0"
+
+# ========================
+# BUILD
+# ========================
+[phases.build]
+cmds = [
+  "dotnet restore",
+  "dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true -p:DebugType=None -p:DebugSymbols=false -o out"
+]
+
+# ========================
+# START
+# ========================
+[start]
+cmd = "./out/IntegraBrasilApi"
+
+# ========================
+# CONFIG EXTRA (opcional, mas recomendado)
+# ========================
+
+# Garante que a app escute na porta correta do EasyPanel
+[phases.setup]
+cmds = [
+  "export ASPNETCORE_URLS=http://0.0.0.0:${PORT:-5000}"
+]
